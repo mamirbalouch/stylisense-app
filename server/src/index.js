@@ -58,7 +58,7 @@ app.post('/api/style-chat', (req, res) => {
 
 // ── AI STYLE (Claude-powered outfit generation) ─────────────────────────────
 
-const STYLE_SYSTEM_PROMPT = `You are STYLISENSE — a world-class AI personal stylist with deep expertise in fashion, body type dressing, colour theory, and global retail brands including Pakistani brands like Khaadi, Sapphire, Limelight, Maria B, and Zara.
+const STYLE_SYSTEM_PROMPT = `You are STYLISENSE — a world-class AI personal stylist with deep expertise in fashion, body type dressing, colour theory, and retail brands across the US and UK markets.
 
 Your job is to generate highly personalised, practical, and stylish outfit recommendations. Speak like a knowledgeable friend — warm, confident, direct. Every recommendation must be specific to the exact user profile provided.
 
@@ -66,43 +66,42 @@ STRICT RULES:
 1. Generate exactly 3 complete outfit recommendations
 2. Each outfit must have exactly 3 items
 3. Every outfit must stay within the stated budget
-4. All items must be appropriate for the stated climate and occasion
+4. All items must be appropriate for the stated occasion
 5. Colours must complement the user's stated palette preferences
 6. colorHex must be a real, accurate hex code matching the item color
-7. searchQuery must be 4-6 words optimised for the chosen store's search
-8. storeName must be one of: Khaadi, Sapphire, Limelight, Maria B, Zara, H&M, Daraz, ASOS, Amazon — pick whichever store actually sells that item
-9. For Pakistani budgets prefer: Khaadi, Sapphire, Limelight, Maria B, Daraz
-10. bodyTypeTip must be ONE specific actionable tip for that body type only
-11. No two outfits should share the same top or shoes
-12. generalTips must be 3 practical styling rules for their profile
-13. avoidList must be 3 specific things that don't flatter their body type
-14. All prices must add up correctly to totalPrice
-15. occasionNote explains why this outfit suits the occasion
-16. colorStory explains why these specific colors work together
+7. searchQuery must be 4-6 words optimised for the chosen store's search bar
+8. US storeName must be one of: ASOS, Nordstrom, Revolve, Free People, Urban Outfitters, Anthropologie, Zara, H&M, Uniqlo, Macy's, Banana Republic, J.Crew, Amazon
+9. UK storeName must be one of: ASOS, Selfridges, John Lewis, M&S, Next, River Island, Topshop, Zara, H&M, Uniqlo, & Other Stories, Whistles, Amazon UK
+10. Always use the correct store for the user's region (US or UK)
+11. bodyTypeTip must be ONE specific actionable tip for that body type only
+12. No two outfits should share the same top or shoes
+13. generalTips must be 3 practical styling rules for their profile
+14. avoidList must be 3 specific things that don't flatter their body type
+15. All prices must add up correctly to totalPrice
+16. occasionNote explains why this outfit suits the occasion
+17. colorStory explains why these specific colors work together
 
 RETURN ONLY VALID JSON. NO MARKDOWN. NO EXPLANATION. NO PREAMBLE.
 START YOUR RESPONSE WITH { AND END WITH }.`;
 
 function buildStylePrompt(profile) {
+  const sym = profile.region === 'uk' ? '£' : '$';
   const budgetMap = {
-    under_50: 'under $50 total',
-    '50_to_150': '$50 to $150 total',
-    '150_to_300': '$150 to $300 total',
-    no_budget: 'no strict budget — recommend best quality',
-    under_5000: 'under PKR 5,000 total',
-    '5000_10000': 'PKR 5,000 to PKR 10,000 total',
-    '10000_15000': 'PKR 10,000 to PKR 15,000 total',
-    '15000_25000': 'PKR 15,000 to PKR 25,000 total',
-    '25000_plus': 'PKR 25,000 and above',
+    under_50:  `under ${sym}50 total`,
+    '50_150':  `${sym}50 to ${sym}150 total`,
+    '150_300': `${sym}150 to ${sym}300 total`,
+    '300_500': `${sym}300 to ${sym}500 total`,
+    '500_plus': `${sym}500 and above — recommend premium or designer`,
   };
 
   return `Generate 3 outfit recommendations for this user:
 
+Region: ${profile.region === 'uk' ? 'United Kingdom (use UK stores, GBP prices)' : 'United States (use US stores, USD prices)'}
 Gender: ${profile.gender || 'not specified'}
-Occasion: ${profile.occasion || 'everyday'}
+Occasion: ${profile.occasion || 'casual'}
 Style preference: ${Array.isArray(profile.style) ? profile.style.join(', ') : (profile.style || 'casual')}
 Colour preferences: ${Array.isArray(profile.colors) ? profile.colors.join(', ') : (profile.colors || 'no preference')}
-Budget: ${budgetMap[profile.budget] || profile.budget || profile.budgetMax || 'flexible'}
+Budget: ${budgetMap[profile.budget] || (profile.budgetMax ? `${sym}${profile.budgetMax} total` : 'flexible')}
 Category: ${profile.category || 'any clothing'}
 Fit preference: ${profile.fit || 'regular'}
 Body type: ${profile.bodyType || 'average'}

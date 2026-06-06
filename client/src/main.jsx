@@ -6,58 +6,114 @@ import './styles/app.css';
 // ── STORE ROUTING ─────────────────────────────────────────────────────────────
 
 const STORE_CONFIG = {
-  'khaadi':    { base: 'https://www.khaadi.com/pk/search?q=', label: 'Khaadi' },
-  'sapphire':  { base: 'https://pk.sapphirepk.com/search?type=product&q=', label: 'Sapphire' },
-  'limelight': { base: 'https://www.limelightpk.com/search?q=', label: 'Limelight' },
-  'maria b':   { base: 'https://www.mariab.pk/search?q=', label: 'Maria B' },
-  'mariab':    { base: 'https://www.mariab.pk/search?q=', label: 'Maria B' },
-  'zara':      { base: 'https://www.zara.com/pk/en/search?searchTerm=', label: 'Zara' },
-  'h&m':       { base: 'https://www2.hm.com/en_pk/search-results.html?q=', label: 'H&M' },
-  'uniqlo':    { base: 'https://www.uniqlo.com/pk/en/search?q=', label: 'Uniqlo' },
-  'amazon':    { base: 'https://www.amazon.com/s?k=', label: 'Amazon' },
-  'asos':      { base: 'https://www.asos.com/search/?q=', label: 'ASOS' },
+  us: {
+    'asos':           { base: 'https://www.asos.com/us/search/?q=', label: 'ASOS' },
+    'nordstrom':      { base: 'https://www.nordstrom.com/sr?origin=keywordsearch&keyword=', label: 'Nordstrom' },
+    'free people':    { base: 'https://www.freepeople.com/search?q=', label: 'Free People' },
+    'revolve':        { base: 'https://www.revolve.com/search/?q=', label: 'Revolve' },
+    'urban outfitters': { base: 'https://www.urbanoutfitters.com/search?q=', label: 'Urban Outfitters' },
+    'anthropologie':  { base: 'https://www.anthropologie.com/search?search=', label: 'Anthropologie' },
+    'zara':           { base: 'https://www.zara.com/us/en/search?searchTerm=', label: 'Zara' },
+    'h&m':            { base: 'https://www2.hm.com/en_us/search-results.html?q=', label: 'H&M' },
+    'uniqlo':         { base: 'https://www.uniqlo.com/us/en/search?q=', label: 'Uniqlo' },
+    "macy's":         { base: 'https://www.macys.com/shop/featured/', label: "Macy's" },
+    'banana republic':{ base: 'https://bananarepublic.gap.com/browse/search.do?searchText=', label: 'Banana Republic' },
+    'j.crew':         { base: 'https://www.jcrew.com/r/search?search_term=', label: 'J.Crew' },
+    'amazon':         { base: 'https://www.amazon.com/s?k=', label: 'Amazon' },
+  },
+  uk: {
+    'asos':           { base: 'https://www.asos.com/search/?q=', label: 'ASOS' },
+    'selfridges':     { base: 'https://www.selfridges.com/GB/en/cat/search/?q=', label: 'Selfridges' },
+    'john lewis':     { base: 'https://www.johnlewis.com/search?search-term=', label: 'John Lewis' },
+    'marks & spencer':{ base: 'https://www.marksandspencer.com/s/?q=', label: 'M&S' },
+    'marks and spencer': { base: 'https://www.marksandspencer.com/s/?q=', label: 'M&S' },
+    'm&s':            { base: 'https://www.marksandspencer.com/s/?q=', label: 'M&S' },
+    'next':           { base: 'https://www.next.co.uk/search?w=', label: 'Next' },
+    'river island':   { base: 'https://www.riverisland.com/search?terms=', label: 'River Island' },
+    'topshop':        { base: 'https://www.asos.com/topshop/cat/?cid=4172&q=', label: 'Topshop' },
+    '& other stories':{ base: 'https://www.stories.com/en_gbp/search?q=', label: '& Other Stories' },
+    'whistles':       { base: 'https://www.whistles.com/search?q=', label: 'Whistles' },
+    'zara':           { base: 'https://www.zara.com/uk/en/search?searchTerm=', label: 'Zara' },
+    'h&m':            { base: 'https://www2.hm.com/en_gb/search-results.html?q=', label: 'H&M' },
+    'uniqlo':         { base: 'https://www.uniqlo.com/uk/en/search?q=', label: 'Uniqlo' },
+    'amazon':         { base: 'https://www.amazon.co.uk/s?k=', label: 'Amazon UK' },
+  },
 };
-const DARAZ_DEFAULT = { base: 'https://www.daraz.pk/catalog/?q=', label: 'Daraz' };
 
-function resolveStore(item) {
-  const storeName = (item.storeName || item.brand || '').toLowerCase().trim();
-  for (const [key, config] of Object.entries(STORE_CONFIG)) {
-    if (storeName.includes(key)) return config;
+const DEFAULT_STORE = {
+  us: { base: 'https://www.asos.com/us/search/?q=', label: 'ASOS' },
+  uk: { base: 'https://www.asos.com/search/?q=', label: 'ASOS' },
+};
+
+function resolveStore(item, region = 'us') {
+  const key = (item.storeName || item.brand || '').toLowerCase().trim();
+  const stores = STORE_CONFIG[region] || STORE_CONFIG.us;
+  for (const [name, config] of Object.entries(stores)) {
+    if (key.includes(name)) return config;
   }
-  return DARAZ_DEFAULT;
+  return DEFAULT_STORE[region] || DEFAULT_STORE.us;
 }
 
-function buildShopUrl(item) {
-  const store = resolveStore(item);
+function buildShopUrl(item, region = 'us') {
+  const store = resolveStore(item, region);
   return store.base + encodeURIComponent(item.searchQuery || item.name);
 }
 
-function getStoreLabel(item) {
-  return resolveStore(item).label;
+function getStoreLabel(item, region = 'us') {
+  return resolveStore(item, region).label;
 }
+
+// ── BUDGET OPTIONS (region-aware) ─────────────────────────────────────────────
+
+const BUDGET_OPTIONS = {
+  us: [
+    { value: 'under_50',  label: 'Under $50',     desc: 'Budget-friendly finds', budgetMax: 50 },
+    { value: '50_150',    label: '$50 – $150',     desc: 'Great everyday picks',  budgetMax: 150 },
+    { value: '150_300',   label: '$150 – $300',    desc: 'Premium quality',       budgetMax: 300 },
+    { value: '300_500',   label: '$300 – $500',    desc: 'Elevated & refined',    budgetMax: 500 },
+    { value: '500_plus',  label: '$500+',          desc: 'Luxury & designer',     budgetMax: 5000 },
+  ],
+  uk: [
+    { value: 'under_50',  label: 'Under £50',      desc: 'Budget-friendly finds', budgetMax: 50 },
+    { value: '50_150',    label: '£50 – £150',      desc: 'Great everyday picks',  budgetMax: 150 },
+    { value: '150_300',   label: '£150 – £300',     desc: 'Premium quality',       budgetMax: 300 },
+    { value: '300_500',   label: '£300 – £500',     desc: 'Elevated & refined',    budgetMax: 500 },
+    { value: '500_plus',  label: '£500+',           desc: 'Luxury & designer',     budgetMax: 5000 },
+  ],
+};
 
 // ── FLOW CONFIG ───────────────────────────────────────────────────────────────
 
 const FLOW_STEPS = [
+  {
+    id: 'region',
+    ariaSays: "Hi! I'm ARIA. First — where are you shopping from? I'll tailor brands and prices to your market.",
+    key: 'region',
+    type: 'duo',
+    options: [
+      { value: 'us', label: 'United States', emoji: '🇺🇸', sub: 'USD · ASOS, Nordstrom, Revolve & more' },
+      { value: 'uk', label: 'United Kingdom', emoji: '🇬🇧', sub: 'GBP · ASOS, Selfridges, John Lewis & more' },
+    ],
+  },
   {
     id: 'occasion',
     ariaSays: "What's the occasion? I'll build the entire look around it.",
     key: 'occasion',
     type: 'grid',
     options: [
-      { value: 'eid', label: 'Eid', emoji: '🌙', desc: 'Festive & elegant' },
-      { value: 'office', label: 'Office', emoji: '💼', desc: 'Professional polish' },
-      { value: 'wedding', label: 'Wedding', emoji: '💍', desc: 'Mehndi · Barat · Walima' },
+      { value: 'office', label: 'Work / Office', emoji: '💼', desc: 'Professional polish' },
+      { value: 'date night', label: 'Date Night', emoji: '🍷', desc: 'Confident & alluring' },
+      { value: 'wedding', label: 'Wedding Guest', emoji: '💍', desc: 'Elegant celebration' },
       { value: 'party', label: 'Party', emoji: '✨', desc: 'Celebrate in style' },
-      { value: 'dinner', label: 'Dinner', emoji: '🍽', desc: 'Elegant evening' },
-      { value: 'daily wear', label: 'Everyday', emoji: '☀', desc: 'Casual & effortless' },
-      { value: 'university', label: 'University', emoji: '📚', desc: 'Smart campus style' },
-      { value: 'travel', label: 'Travel', emoji: '✈', desc: 'Move in style' },
+      { value: 'dinner', label: 'Dinner Out', emoji: '🍽', desc: 'Smart evening look' },
+      { value: 'casual', label: 'Casual / Weekend', emoji: '☀', desc: 'Relaxed & effortless' },
+      { value: 'festival', label: 'Festival', emoji: '🎪', desc: 'Bold & expressive' },
+      { value: 'travel', label: 'Travel', emoji: '✈', desc: 'Stylish on the move' },
     ],
   },
   {
     id: 'gender',
-    ariaSays: "Perfect. Who am I styling today?",
+    ariaSays: "Who am I styling today?",
     key: 'gender',
     type: 'duo',
     options: [
@@ -67,19 +123,19 @@ const FLOW_STEPS = [
   },
   {
     id: 'style',
-    ariaSays: "What's your style personality? Pick everything that resonates.",
+    ariaSays: "What's your style personality? Pick everything that feels like you.",
     key: 'style',
     type: 'multi',
     options: [
       { value: 'elegant', label: 'Elegant', emoji: '🌸' },
-      { value: 'modest', label: 'Modest', emoji: '🕊' },
       { value: 'minimal', label: 'Minimal', emoji: '◻' },
       { value: 'trendy', label: 'Trendy', emoji: '🔥' },
-      { value: 'traditional', label: 'Traditional', emoji: '🏺' },
+      { value: 'classic', label: 'Classic', emoji: '🎩' },
       { value: 'luxury', label: 'Luxury', emoji: '💎' },
+      { value: 'streetwear', label: 'Streetwear', emoji: '🧢' },
+      { value: 'bohemian', label: 'Bohemian', emoji: '🌿' },
       { value: 'bold', label: 'Bold', emoji: '⚡' },
-      { value: 'fusion', label: 'Fusion', emoji: '🎨' },
-      { value: 'simple', label: 'Simple', emoji: '🤍' },
+      { value: 'preppy', label: 'Preppy', emoji: '🎀' },
     ],
   },
   {
@@ -88,29 +144,29 @@ const FLOW_STEPS = [
     key: 'colors',
     type: 'color',
     options: [
-      { value: 'pastel', label: 'Pastels', hex: '#f5a7b8' },
+      { value: 'neutral', label: 'Neutrals', hex: '#c9a97d', dark: true },
       { value: 'black', label: 'Black & Dark', hex: '#2d2d2d' },
       { value: 'white/ivory', label: 'White & Ivory', hex: '#f5f0e8', dark: true },
-      { value: 'neutral', label: 'Beige & Neutral', hex: '#c9a97d', dark: true },
+      { value: 'pastel', label: 'Pastels', hex: '#f5a7b8' },
+      { value: 'earth tones', label: 'Earth Tones', hex: '#9b5e38' },
       { value: 'green/blue', label: 'Green & Blue', hex: '#3d8f72' },
       { value: 'bold colors', label: 'Bold Brights', hex: '#d63031' },
-      { value: 'earth tones', label: 'Earth Tones', hex: '#9b5e38' },
       { value: 'no preference', label: 'Surprise Me', hex: '#7b5ea7' },
     ],
   },
   {
     id: 'category',
-    ariaSays: "What kind of clothing are you after?",
+    ariaSays: "What type of clothing are you looking for?",
     key: 'category',
     type: 'grid',
     options: [
-      { value: 'kurti', label: 'Kurti', emoji: '👗', desc: 'Classic & timeless' },
-      { value: '2-piece suit', label: '2-Piece', emoji: '✨', desc: 'Top + bottoms' },
-      { value: '3-piece suit', label: '3-Piece', emoji: '💫', desc: 'With dupatta' },
-      { value: 'maxi', label: 'Maxi / Gown', emoji: '🌟', desc: 'Floor-length drama' },
+      { value: 'dress', label: 'Dress', emoji: '👗', desc: 'One-and-done look' },
+      { value: 'blazer set', label: 'Blazer Set', emoji: '🧥', desc: 'Sharp & structured' },
+      { value: 'jeans outfit', label: 'Jeans Outfit', emoji: '👖', desc: 'Casual elevated' },
       { value: 'co-ord set', label: 'Co-ord Set', emoji: '🎯', desc: 'Matching set' },
-      { value: 'shirt/trouser', label: 'Shirt & Trouser', emoji: '👔', desc: 'Smart everyday' },
-      { value: 'fusion outfit', label: 'Fusion', emoji: '🎨', desc: 'East meets West' },
+      { value: 'maxi / gown', label: 'Maxi / Gown', emoji: '🌟', desc: 'Floor-length drama' },
+      { value: 'shirt & trousers', label: 'Shirt & Trousers', emoji: '👔', desc: 'Smart casual' },
+      { value: 'jumpsuit', label: 'Jumpsuit', emoji: '✨', desc: 'Effortless one-piece' },
     ],
   },
   {
@@ -118,13 +174,7 @@ const FLOW_STEPS = [
     ariaSays: "Last one — what's your budget? I'll stay within it, strictly.",
     key: 'budget',
     type: 'budget',
-    options: [
-      { value: 'under_5000', label: 'Under PKR 5,000', desc: 'Smart budget picks', budgetMax: 4999 },
-      { value: '5000_10000', label: 'PKR 5,000 – 10,000', desc: 'Great value finds', budgetMax: 10000 },
-      { value: '10000_15000', label: 'PKR 10,000 – 15,000', desc: 'Premium quality', budgetMax: 15000 },
-      { value: '15000_25000', label: 'PKR 15,000 – 25,000', desc: 'Elevated & refined', budgetMax: 25000 },
-      { value: '25000_plus', label: 'PKR 25,000+', desc: 'Luxury & designer', budgetMax: 100000 },
-    ],
+    getOptions: (profile) => BUDGET_OPTIONS[profile.region || 'us'],
   },
 ];
 
@@ -159,9 +209,9 @@ function ColorDot({ hex, name }) {
 
 // ── OUTFIT ITEM ROW ───────────────────────────────────────────────────────────
 
-function AiOutfitItem({ item }) {
-  const url = buildShopUrl(item);
-  const storeLabel = getStoreLabel(item);
+function AiOutfitItem({ item, region, currency }) {
+  const url = buildShopUrl(item, region);
+  const storeLabel = getStoreLabel(item, region);
   return (
     <a href={url} target="_blank" rel="noreferrer" className="outfit-item-row" title={`View on ${storeLabel}`}>
       <span className="item-type-badge">{item.type}</span>
@@ -171,14 +221,15 @@ function AiOutfitItem({ item }) {
         {item.brand && <span className="item-brand"> · {item.brand}</span>}
       </span>
       <span className="item-store-tag">{storeLabel}</span>
-      <span className="item-price">PKR {item.price?.toLocaleString() ?? '—'}</span>
+      <span className="item-price">{currency}{item.price?.toLocaleString() ?? '—'}</span>
     </a>
   );
 }
 
 // ── OUTFIT CARD ───────────────────────────────────────────────────────────────
 
-function AiOutfitCard({ outfit, index }) {
+function AiOutfitCard({ outfit, index, region, currency }) {
+  const firstItem = outfit.items?.[0] || { name: outfit.name, searchQuery: outfit.name };
   return (
     <article className="ai-outfit-card">
       <div className="outfit-card-accent" />
@@ -188,7 +239,9 @@ function AiOutfitCard({ outfit, index }) {
         <p className="outfit-description">{outfit.description}</p>
       </div>
       <div className="outfit-items">
-        {outfit.items?.map((item, i) => <AiOutfitItem key={i} item={item} />)}
+        {outfit.items?.map((item, i) => (
+          <AiOutfitItem key={i} item={item} region={region} currency={currency} />
+        ))}
       </div>
       <div className="outfit-footer">
         <div className="outfit-swatches">
@@ -196,7 +249,7 @@ function AiOutfitCard({ outfit, index }) {
         </div>
         <div className="outfit-total">
           <span className="total-label">complete look</span>
-          <span className="total-price">PKR {outfit.totalPrice?.toLocaleString()}</span>
+          <span className="total-price">{currency}{outfit.totalPrice?.toLocaleString()}</span>
         </div>
       </div>
       {outfit.colorStory && <div className="outfit-story">{outfit.colorStory}</div>}
@@ -211,10 +264,10 @@ function AiOutfitCard({ outfit, index }) {
         </div>
       )}
       <a
-        href={buildShopUrl(outfit.items?.[0] || { name: outfit.name, searchQuery: outfit.name })}
+        href={buildShopUrl(firstItem, region)}
         target="_blank" rel="noreferrer" className="shop-button"
       >
-        Shop on {getStoreLabel(outfit.items?.[0] || {})} <ShoppingBag size={14} />
+        Shop on {getStoreLabel(firstItem, region)} <ShoppingBag size={14} />
       </a>
     </article>
   );
@@ -434,7 +487,12 @@ function WizardScreen({ step, totalSteps, stepConfig, profile, multiBuffer, onSe
       </div>
 
       <div className="step-body">
-        <StepOptions stepConfig={stepConfig} selected={profile[stepConfig.key]} multi={multiBuffer} onSelect={onSelect} />
+        <StepOptions
+          stepConfig={{ ...stepConfig, options: stepConfig.getOptions ? stepConfig.getOptions(profile) : stepConfig.options }}
+          selected={profile[stepConfig.key]}
+          multi={multiBuffer}
+          onSelect={onSelect}
+        />
       </div>
 
       {isMulti && (
@@ -557,7 +615,9 @@ function ResultsScreen({ recommendation, profile, onReset }) {
       {tab === 'outfits' && (
         <>
           <div className="ai-outfit-grid">
-            {recommendation.outfits.map((outfit, i) => <AiOutfitCard key={outfit.id || i} outfit={outfit} index={i} />)}
+            {recommendation.outfits.map((outfit, i) => (
+              <AiOutfitCard key={outfit.id || i} outfit={outfit} index={i} region={profile.region || 'us'} currency={profile.currency || '$'} />
+            ))}
           </div>
           {(recommendation.generalTips?.length > 0 || recommendation.avoidList?.length > 0) && (
             <StyleTipsPanel tips={recommendation.generalTips} avoid={recommendation.avoidList} />
@@ -643,8 +703,13 @@ function App() {
       setMultiBuffer(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
     } else {
       const updated = { ...profile, [stepConfig.key]: value };
+      if (stepConfig.id === 'region') {
+        updated.currency = value === 'uk' ? '£' : '$';
+        updated.currencyCode = value === 'uk' ? 'GBP' : 'USD';
+      }
       if (stepConfig.id === 'budget') {
-        const opt = stepConfig.options.find(o => o.value === value);
+        const opts = BUDGET_OPTIONS[profile.region || 'us'];
+        const opt = opts?.find(o => o.value === value);
         if (opt) updated.budgetMax = opt.budgetMax;
       }
       setProfile(updated);
