@@ -1,0 +1,19 @@
+{
+  "name": "stylisense-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stylisense AI styling MVP: adaptive questions, product matching, affiliate links.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "install:all": "npm install && npm install --workspace server && npm install --workspace client",
+    "start": "npm run start --workspace server",
+    "build": "npm run build --workspace client"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
