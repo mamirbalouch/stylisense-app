@@ -3,6 +3,39 @@ import { createRoot } from 'react-dom/client';
 import { Sparkles, Send, ShoppingBag, RefreshCw, ChevronLeft, ChevronRight, Check, Search, TrendingUp } from 'lucide-react';
 import './styles/app.css';
 
+// ── STORE ROUTING ─────────────────────────────────────────────────────────────
+
+const STORE_CONFIG = {
+  'khaadi':    { base: 'https://www.khaadi.com/pk/search?q=', label: 'Khaadi' },
+  'sapphire':  { base: 'https://pk.sapphirepk.com/search?type=product&q=', label: 'Sapphire' },
+  'limelight': { base: 'https://www.limelightpk.com/search?q=', label: 'Limelight' },
+  'maria b':   { base: 'https://www.mariab.pk/search?q=', label: 'Maria B' },
+  'mariab':    { base: 'https://www.mariab.pk/search?q=', label: 'Maria B' },
+  'zara':      { base: 'https://www.zara.com/pk/en/search?searchTerm=', label: 'Zara' },
+  'h&m':       { base: 'https://www2.hm.com/en_pk/search-results.html?q=', label: 'H&M' },
+  'uniqlo':    { base: 'https://www.uniqlo.com/pk/en/search?q=', label: 'Uniqlo' },
+  'amazon':    { base: 'https://www.amazon.com/s?k=', label: 'Amazon' },
+  'asos':      { base: 'https://www.asos.com/search/?q=', label: 'ASOS' },
+};
+const DARAZ_DEFAULT = { base: 'https://www.daraz.pk/catalog/?q=', label: 'Daraz' };
+
+function resolveStore(item) {
+  const storeName = (item.storeName || item.brand || '').toLowerCase().trim();
+  for (const [key, config] of Object.entries(STORE_CONFIG)) {
+    if (storeName.includes(key)) return config;
+  }
+  return DARAZ_DEFAULT;
+}
+
+function buildShopUrl(item) {
+  const store = resolveStore(item);
+  return store.base + encodeURIComponent(item.searchQuery || item.name);
+}
+
+function getStoreLabel(item) {
+  return resolveStore(item).label;
+}
+
 // ── FLOW CONFIG ───────────────────────────────────────────────────────────────
 
 const FLOW_STEPS = [
@@ -127,15 +160,17 @@ function ColorDot({ hex, name }) {
 // ── OUTFIT ITEM ROW ───────────────────────────────────────────────────────────
 
 function AiOutfitItem({ item }) {
-  const url = `https://www.asos.com/search/?q=${encodeURIComponent(item.searchQuery || item.name)}`;
+  const url = buildShopUrl(item);
+  const storeLabel = getStoreLabel(item);
   return (
-    <a href={url} target="_blank" rel="noreferrer" className="outfit-item-row">
+    <a href={url} target="_blank" rel="noreferrer" className="outfit-item-row" title={`View on ${storeLabel}`}>
       <span className="item-type-badge">{item.type}</span>
       <span className="item-name">
         <ColorDot hex={item.colorHex || '#888'} name={item.color} />
         {item.name}
         {item.brand && <span className="item-brand"> · {item.brand}</span>}
       </span>
+      <span className="item-store-tag">{storeLabel}</span>
       <span className="item-price">PKR {item.price?.toLocaleString() ?? '—'}</span>
     </a>
   );
@@ -176,10 +211,10 @@ function AiOutfitCard({ outfit, index }) {
         </div>
       )}
       <a
-        href={`https://www.asos.com/search/?q=${encodeURIComponent(outfit.items?.[0]?.searchQuery || outfit.name)}`}
+        href={buildShopUrl(outfit.items?.[0] || { name: outfit.name, searchQuery: outfit.name })}
         target="_blank" rel="noreferrer" className="shop-button"
       >
-        Shop This Look <ShoppingBag size={14} />
+        Shop on {getStoreLabel(outfit.items?.[0] || {})} <ShoppingBag size={14} />
       </a>
     </article>
   );

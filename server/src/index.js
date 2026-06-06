@@ -69,14 +69,16 @@ STRICT RULES:
 4. All items must be appropriate for the stated climate and occasion
 5. Colours must complement the user's stated palette preferences
 6. colorHex must be a real, accurate hex code matching the item color
-7. searchQuery must be 4-6 words someone would type on ASOS, Amazon, or Khaadi
-8. bodyTypeTip must be ONE specific actionable tip for that body type only
-9. No two outfits should share the same top or shoes
-10. generalTips must be 3 practical styling rules for their profile
-11. avoidList must be 3 specific things that don't flatter their body type
-12. All prices must add up correctly to totalPrice
-13. occasionNote explains why this outfit suits the occasion
-14. colorStory explains why these specific colors work together
+7. searchQuery must be 4-6 words optimised for the chosen store's search
+8. storeName must be one of: Khaadi, Sapphire, Limelight, Maria B, Zara, H&M, Daraz, ASOS, Amazon — pick whichever store actually sells that item
+9. For Pakistani budgets prefer: Khaadi, Sapphire, Limelight, Maria B, Daraz
+10. bodyTypeTip must be ONE specific actionable tip for that body type only
+11. No two outfits should share the same top or shoes
+12. generalTips must be 3 practical styling rules for their profile
+13. avoidList must be 3 specific things that don't flatter their body type
+14. All prices must add up correctly to totalPrice
+15. occasionNote explains why this outfit suits the occasion
+16. colorStory explains why these specific colors work together
 
 RETURN ONLY VALID JSON. NO MARKDOWN. NO EXPLANATION. NO PREAMBLE.
 START YOUR RESPONSE WITH { AND END WITH }.`;
@@ -120,7 +122,8 @@ Return a JSON object with this exact structure:
           "colorHex": "#hexcode",
           "price": 45,
           "searchQuery": "search query 4-6 words",
-          "brand": "Optional brand"
+          "brand": "Brand name e.g. Khaadi",
+          "storeName": "Khaadi"
         }
       ],
       "totalPrice": 140,

@@ -578,6 +578,11 @@ input, textarea { font: inherit; color: inherit; }
 }
 .item-name { flex: 1; font-size: 13px; }
 .item-brand { color: var(--text-muted); font-size: 12px; }
+.item-store-tag {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-muted); background: var(--panel-strong);
+  border-radius: 4px; padding: 2px 6px; white-space: nowrap;
+}
 .item-price { color: var(--gold-light); font-weight: 700; font-size: 13px; white-space: nowrap; }
 .outfit-footer { display: flex; justify-content: space-between; align-items: center; }
 .outfit-swatches { display: flex; align-items: center; gap: 4px; }
